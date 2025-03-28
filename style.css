@@ -32,11 +32,18 @@ html, body {
   height: 30px;
   background-color: #0077ff;
   position: absolute;
-  bottom: 50px; /* ✅ moved up by 50px */
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 15px;
   z-index: 2;
+}
+
+/* ✅ Move catcher up by 200px on mobile */
+@media (max-width: 768px) {
+  #catcher {
+    bottom: 200px;
+  }
 }
 
 .item {
