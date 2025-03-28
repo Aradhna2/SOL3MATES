@@ -32,7 +32,7 @@ html, body {
   height: 30px;
   background-color: #0077ff;
   position: absolute;
-  bottom: 30px;
+  bottom: 50px; /* ✅ moved up by 50px */
   left: 50%;
   transform: translateX(-50%);
   border-radius: 15px;

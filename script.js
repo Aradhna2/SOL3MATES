@@ -94,7 +94,7 @@ function spawnItem() {
       scoreDisplay.textContent = `Score: ${score}`;
       item.remove();
     } else if (top > window.innerHeight) {
-      item.remove(); // Green object missed — no consequence
+      item.remove(); // green item missed — ignore
     } else {
       requestAnimationFrame(fall);
     }
@@ -168,9 +168,7 @@ function restartGame() {
   spawnItem();
 }
 
-// ========== CONTROLS ==========
-
-// Keyboard
+// Controls
 document.addEventListener("keydown", (e) => {
   if (!gameStarted && (e.key === " " || e.key === "Spacebar")) startGame();
   if (!gameRunning) return;
@@ -181,27 +179,24 @@ document.addEventListener("keydown", (e) => {
     catcher.style.left = `${catcherLeft + catcherSpeed}px`;
 });
 
-// Mouse
 document.addEventListener("mousemove", (e) => {
   if (!gameRunning) return;
   const mouseX = e.clientX;
   catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, mouseX - catcher.offsetWidth / 2))}px`;
 });
 
-// Tap/Click to Start
 document.addEventListener("click", startGame);
 document.addEventListener("touchstart", (e) => {
   if (!gameStarted) startGame();
 });
 
-// Touch Move
 document.addEventListener("touchmove", (e) => {
   if (!gameRunning) return;
   const touchX = e.touches[0].clientX;
   catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, touchX - catcher.offsetWidth / 2))}px`;
 });
 
-// Swipe Support
+// Swipe detection
 let touchStartX = null;
 let touchEndX = null;
 const swipeThreshold = 30;
