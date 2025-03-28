@@ -6,6 +6,8 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: sans-serif;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #game {
@@ -17,25 +19,23 @@ html, body {
   background-size: cover;
 }
 
-/* ✅ Overlay tint with 75% opacity */
 .overlay {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.25); /* 25% dark overlay = 75% background visibility */
+  background-color: rgba(0, 0, 0, 0.25);
   z-index: 1;
 }
 
-/* Game elements */
 #catcher {
-  width: 100px;
-  height: 20px;
+  width: 120px;
+  height: 30px;
   background-color: #0077ff;
   position: absolute;
-  bottom: 10px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  border-radius: 10px;
+  border-radius: 15px;
   z-index: 2;
 }
 
@@ -49,7 +49,6 @@ html, body {
   width: 100px;
   height: 100px;
   background: url('https://i.postimg.cc/MT95hskb/Forest-Green.png') no-repeat center center / contain;
-  border-radius: 0;
 }
 
 .bad {

@@ -25,8 +25,8 @@ function startGame() {
   gameStarted = true;
   gameRunning = true;
   startMessage.style.display = "none";
-  timeLeft = 30;
   score = 0;
+  timeLeft = 30;
   itemFallSpeed = 5;
   spawnRate = 700;
   moreHazards = false;
@@ -44,30 +44,17 @@ function spawnItem() {
 
   const rand = Math.random();
   if (!moreHazards) {
-    if (rand < 0.7) {
-      item.classList.add("good");
-      item.dataset.type = "good";
-    } else if (rand < 0.9) {
-      item.classList.add("bad");
-      item.dataset.type = "bad";
-    } else {
-      item.classList.add("deadly");
-      item.dataset.type = "deadly";
-    }
+    if (rand < 0.7) item.classList.add("good"), item.dataset.type = "good";
+    else if (rand < 0.9) item.classList.add("bad"), item.dataset.type = "bad";
+    else item.classList.add("deadly"), item.dataset.type = "deadly";
   } else {
-    if (rand < 0.4) {
-      item.classList.add("good");
-      item.dataset.type = "good";
-    } else if (rand < 0.8) {
-      item.classList.add("bad");
-      item.dataset.type = "bad";
-    } else {
-      item.classList.add("deadly");
-      item.dataset.type = "deadly";
-    }
+    if (rand < 0.4) item.classList.add("good"), item.dataset.type = "good";
+    else if (rand < 0.8) item.classList.add("bad"), item.dataset.type = "bad";
+    else item.classList.add("deadly"), item.dataset.type = "deadly";
   }
 
   item.style.left = `${Math.random() * (game.offsetWidth - 100)}px`;
+  item.style.top = "0px";
   game.appendChild(item);
 
   function fall() {
@@ -99,6 +86,7 @@ function spawnItem() {
         spawnRate = Math.max(300, spawnRate - 20);
       } else if (type === "deadly") {
         clearInterval(countdownInterval);
+        gameRunning = false;
         endGame();
         return;
       }
@@ -106,7 +94,7 @@ function spawnItem() {
       scoreDisplay.textContent = `Score: ${score}`;
       item.remove();
     } else if (top > window.innerHeight) {
-      item.remove();
+      item.remove(); // Green object missed — no consequence
     } else {
       requestAnimationFrame(fall);
     }
@@ -118,10 +106,7 @@ function spawnItem() {
 
 function startCountdown() {
   countdownInterval = setInterval(() => {
-    if (!gameRunning) {
-      clearInterval(countdownInterval);
-      return;
-    }
+    if (!gameRunning) return clearInterval(countdownInterval);
 
     timeLeft--;
     updateTimerDisplay();
@@ -133,6 +118,7 @@ function startCountdown() {
 
     if (timeLeft <= 0) {
       clearInterval(countdownInterval);
+      gameRunning = false;
       endGame();
     }
   }, 1000);
@@ -182,31 +168,63 @@ function restartGame() {
   spawnItem();
 }
 
-// Controls
+// ========== CONTROLS ==========
+
+// Keyboard
 document.addEventListener("keydown", (e) => {
-  if (!gameStarted && (e.key === " " || e.key === "Spacebar")) {
-    startGame();
-  }
+  if (!gameStarted && (e.key === " " || e.key === "Spacebar")) startGame();
   if (!gameRunning) return;
   const catcherLeft = catcher.offsetLeft;
-  if (e.key === "ArrowLeft" && catcherLeft > 0) {
+  if (e.key === "ArrowLeft" && catcherLeft > 0)
     catcher.style.left = `${catcherLeft - catcherSpeed}px`;
-  } else if (e.key === "ArrowRight" && catcherLeft + catcher.offsetWidth < game.offsetWidth) {
+  else if (e.key === "ArrowRight" && catcherLeft + catcher.offsetWidth < game.offsetWidth)
     catcher.style.left = `${catcherLeft + catcherSpeed}px`;
-  }
 });
 
-document.addEventListener("click", startGame);
-document.addEventListener("touchstart", startGame);
-
+// Mouse
 document.addEventListener("mousemove", (e) => {
   if (!gameRunning) return;
   const mouseX = e.clientX;
   catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, mouseX - catcher.offsetWidth / 2))}px`;
 });
 
+// Tap/Click to Start
+document.addEventListener("click", startGame);
+document.addEventListener("touchstart", (e) => {
+  if (!gameStarted) startGame();
+});
+
+// Touch Move
 document.addEventListener("touchmove", (e) => {
   if (!gameRunning) return;
   const touchX = e.touches[0].clientX;
   catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, touchX - catcher.offsetWidth / 2))}px`;
 });
+
+// Swipe Support
+let touchStartX = null;
+let touchEndX = null;
+const swipeThreshold = 30;
+
+document.addEventListener("touchstart", (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+document.addEventListener("touchend", (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+});
+
+function handleSwipe() {
+  if (!touchStartX || !touchEndX) return;
+  const deltaX = touchEndX - touchStartX;
+  const catcherLeft = catcher.offsetLeft;
+  if (Math.abs(deltaX) > swipeThreshold) {
+    if (deltaX > 0 && catcherLeft + catcher.offsetWidth < game.offsetWidth) {
+      catcher.style.left = `${catcherLeft + catcherSpeed}px`;
+    } else if (deltaX < 0 && catcherLeft > 0) {
+      catcher.style.left = `${catcherLeft - catcherSpeed}px`;
+    }
+  }
+  touchStartX = null;
+  touchEndX = null;
+}
