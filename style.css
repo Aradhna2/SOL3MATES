@@ -39,7 +39,6 @@ html, body {
   z-index: 2;
 }
 
-/* ✅ Move catcher up by 200px on mobile */
 @media (max-width: 768px) {
   #catcher {
     bottom: 200px;
