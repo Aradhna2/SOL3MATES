@@ -6,8 +6,42 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: sans-serif;
-  touch-action: pan-y;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+#formContainer {
+  padding: 40px;
+  max-width: 400px;
+  margin: 10% auto;
+  background: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+#formContainer h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+#playerForm label {
+  display: block;
+  margin-top: 10px;
+}
+#playerForm input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+}
+#playerForm button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background: #0077ff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+#playerForm button:hover {
+  background: #005fcc;
 }
 
 #game {
@@ -50,20 +84,17 @@ html, body {
   top: 0;
   z-index: 2;
 }
-
 .good {
   width: 100px;
   height: 100px;
   background: url('https://i.postimg.cc/MT95hskb/Forest-Green.png') no-repeat center center / contain;
 }
-
 .bad {
   width: 30px;
   height: 30px;
   background-color: red;
   border-radius: 50%;
 }
-
 .deadly {
   width: 30px;
   height: 30px;
@@ -98,7 +129,6 @@ html, body {
   text-align: center;
   z-index: 3;
 }
-
 #leaderboard {
   position: absolute;
   top: 10px;
@@ -109,17 +139,4 @@ html, body {
   padding: 10px;
   border-radius: 8px;
   z-index: 2;
-}
-
-#startMessage {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-  background: white;
-  padding: 20px;
-  border: 2px solid #0077ff;
-  border-radius: 10px;
-  z-index: 3;
 }

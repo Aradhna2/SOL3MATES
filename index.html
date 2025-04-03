@@ -17,7 +17,25 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="game">
+  <!-- Pre-Game Form -->
+  <div id="formContainer">
+    <h2>Before You Play</h2>
+    <form id="playerForm">
+      <label for="formName">Name:</label>
+      <input type="text" id="formName" required />
+
+      <label for="formEmail">Email Address:</label>
+      <input type="email" id="formEmail" required />
+
+      <label for="formShoe">Shoe Size (e.g., EU 42, UK 9.5):</label>
+      <input type="text" id="formShoe" required />
+
+      <button type="submit">Start Game</button>
+    </form>
+  </div>
+
+  <!-- Game UI -->
+  <div id="game" style="display: none;">
     <div class="overlay"></div>
     <div id="catcher"></div>
     <div id="score">Score: 0</div>
@@ -28,12 +46,10 @@
     </div>
     <div id="popup">
       <p>Game Over!</p>
-      <input type="text" id="username" placeholder="Enter your name" />
       <button id="submitScoreBtn">Submit your score</button>
       <br><br>
-      <button onclick="location.reload()">Retry</button>
+      <button id="retryBtn">Retry</button>
     </div>
-    <div id="startMessage">Click, tap, or press spacebar to start!</div>
   </div>
 
   <script type="module" src="script.js"></script>

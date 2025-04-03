@@ -21,18 +21,62 @@ const catcher = document.getElementById("catcher");
 const scoreDisplay = document.getElementById("score");
 const popup = document.getElementById("popup");
 const scoresList = document.getElementById("scores");
-const usernameInput = document.getElementById("username");
-const startMessage = document.getElementById("startMessage");
 const timerDisplay = document.getElementById("timer");
 const submitBtn = document.getElementById("submitScoreBtn");
+const retryBtn = document.getElementById("retryBtn");
 const game = document.getElementById("game");
+const form = document.getElementById("playerForm");
+const formContainer = document.getElementById("formContainer");
 
-let score = 0, gameRunning = false, gameStarted = false;
-let catcherSpeed = 30, itemFallSpeed = 5, spawnRate = 700;
+let playerName = "", playerEmail = "", playerShoeSize = "";
+let score = 0, gameRunning = false;
+let itemFallSpeed = 5, spawnRate = 700;
 let countdownInterval, timeLeft = 30, moreHazards = false;
 
-submitBtn.onclick = submitScore;
-updateLeaderboard();
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  playerName = document.getElementById("formName").value.trim();
+  playerEmail = document.getElementById("formEmail").value.trim();
+  playerShoeSize = document.getElementById("formShoe").value.trim();
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const shoeRegex = /^(EU|UK|US)\s?(?:[1-9]|[1-3][0-9]|4[0-7])(\.5)?$/i;
+
+  if (!playerName || playerName.length < 2) {
+    alert("Please enter a valid name (min 2 characters).");
+    return;
+  }
+  if (!emailRegex.test(playerEmail)) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+  if (!shoeRegex.test(playerShoeSize)) {
+    alert("Shoe size must include UK, US, or EU followed by a size up to 47 (e.g., EU 42.5).");
+    return;
+  }
+
+  formContainer.style.display = "none";
+  game.style.display = "block";
+  startGame();
+});
+
+submitBtn.onclick = function () {
+  if (!playerName) return;
+  push(ref(db, "scores"), {
+    name: playerName,
+    score: score,
+    email: playerEmail,
+    shoeSize: playerShoeSize,
+    timestamp: Date.now()
+  });
+  submitBtn.style.display = "none";
+};
+
+retryBtn.onclick = function () {
+  popup.style.display = "none";
+  clearGame();
+  startGame();
+};
 
 function updateLeaderboard() {
   const leaderboardRef = query(ref(db, "scores"), orderByChild("score"), limitToLast(3));
@@ -51,42 +95,23 @@ function updateLeaderboard() {
   });
 }
 
-function submitScore() {
-  const name = usernameInput.value.trim();
-  const validNamePattern = /^[a-zA-Z\s]{2,20}$/;
-  const forbiddenWords = /badword1|badword2|offensiveword/i;
-
-  if (!name) {
-    alert("Please enter your name.");
-    return;
-  }
-  if (!validNamePattern.test(name)) {
-    alert("Name must be 2–20 letters only (no numbers or symbols).");
-    return;
-  }
-  if (forbiddenWords.test(name)) {
-    alert("Please choose a respectful name.");
-    return;
-  }
-
-  push(ref(db, "scores"), { name, score, timestamp: Date.now() });
-  popup.style.display = "none";
+function startGame() {
+  gameRunning = true;
+  updateLeaderboard();
+  countdownInterval = setInterval(updateCountdown, 1000);
+  spawnItem();
 }
 
-function startGame() {
-  if (gameStarted) return;
-  gameStarted = true;
-  gameRunning = true;
-  startMessage.style.display = "none";
+function clearGame() {
   score = 0;
   timeLeft = 30;
   itemFallSpeed = 5;
   spawnRate = 700;
   moreHazards = false;
+  gameRunning = false;
   scoreDisplay.textContent = "Score: 0";
   updateTimerDisplay();
-  startCountdown();
-  spawnItem();
+  document.querySelectorAll(".item").forEach(el => el.remove());
 }
 
 function spawnItem() {
@@ -143,21 +168,19 @@ function handleItemCatch(type) {
   scoreDisplay.textContent = `Score: ${score}`;
 }
 
-function startCountdown() {
-  countdownInterval = setInterval(() => {
-    if (!gameRunning) return clearInterval(countdownInterval);
-    timeLeft--;
-    updateTimerDisplay();
-    if (timeLeft <= 23 && !moreHazards) {
-      moreHazards = true;
-      itemFallSpeed += 1.5;
-    }
-    if (timeLeft <= 0) {
-      clearInterval(countdownInterval);
-      gameRunning = false;
-      endGame();
-    }
-  }, 1000);
+function updateCountdown() {
+  if (!gameRunning) return;
+  timeLeft--;
+  updateTimerDisplay();
+  if (timeLeft <= 23 && !moreHazards) {
+    moreHazards = true;
+    itemFallSpeed += 1.5;
+  }
+  if (timeLeft <= 0) {
+    clearInterval(countdownInterval);
+    gameRunning = false;
+    endGame();
+  }
 }
 
 function updateTimerDisplay() {
@@ -166,31 +189,28 @@ function updateTimerDisplay() {
 
 function endGame() {
   popup.style.display = "block";
+  submitBtn.style.display = "inline-block";
 }
 
-document.addEventListener("keydown", (e) => {
-  if (!gameStarted && (e.key === " " || e.key === "Spacebar")) startGame();
+document.addEventListener("touchmove", (e) => {
   if (!gameRunning) return;
-  const catcherLeft = catcher.offsetLeft;
-  if (e.key === "ArrowLeft" && catcherLeft > 0)
-    catcher.style.left = `${catcherLeft - catcherSpeed}px`;
-  else if (e.key === "ArrowRight" && catcherLeft + catcher.offsetWidth < game.offsetWidth)
-    catcher.style.left = `${catcherLeft + catcherSpeed}px`;
+  const touchX = e.touches[0].clientX;
+  const newLeft = touchX - catcher.offsetWidth / 2;
+  catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, newLeft))}px`;
 });
 
 document.addEventListener("mousemove", (e) => {
   if (!gameRunning) return;
   const mouseX = e.clientX;
-  catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, mouseX - catcher.offsetWidth / 2))}px`;
+  const newLeft = mouseX - catcher.offsetWidth / 2;
+  catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, newLeft))}px`;
 });
 
-document.addEventListener("click", startGame);
-document.addEventListener("touchstart", (e) => {
-  if (!gameStarted) startGame();
-});
-
-document.addEventListener("touchmove", (e) => {
+document.addEventListener("keydown", (e) => {
   if (!gameRunning) return;
-  const touchX = e.touches[0].clientX;
-  catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, touchX - catcher.offsetWidth / 2))}px`;
+  const step = 30;
+  let catcherLeft = catcher.offsetLeft;
+  if (e.key === "ArrowLeft") catcherLeft -= step;
+  if (e.key === "ArrowRight") catcherLeft += step;
+  catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, catcherLeft))}px`;
 });
