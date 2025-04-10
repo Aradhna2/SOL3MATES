@@ -1,48 +1,73 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Work+Sans:wght@400;600&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Work+Sans:wght@400;600&display=swap');
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body, html {
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  width: 100%;
+  height: 100%;
   font-family: 'Work Sans', sans-serif;
-  background-color: #fffaf4;
+  background: #fffaf4;
   overflow: hidden;
+  touch-action: manipulation;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#game, #formContainer {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
 }
 
-/* Logo Always Visible */
-.logo-link {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+/* Logo + Score Row */
+#gameHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: absolute;
+  top: 10px;
+  width: calc(100% - 20px);
+  padding: 0 10px;
   z-index: 999;
 }
-.logo {
-  width: 140px;
-  height: auto;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.logo:active {
-  opacity: 0.8;
-  transform: scale(0.98);
+
+.logo-link img.logo {
+  height: 40px;
 }
 
-/* Landing Form */
+#score, #timer {
+  font-size: 16px;
+  color: #fff;
+}
+#score { margin-right: 10px; }
+#timer { margin-left: 10px; }
+
+#leaderboard {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  font-size: 14px;
+  color: #fff;
+  background: rgba(0,0,0,0.6);
+  padding: 8px;
+  border-radius: 8px;
+  z-index: 2;
+}
+
 #formContainer {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  padding: 80px 20px 30px;
   align-items: center;
-  padding: 100px 20px 30px;
-  max-width: 500px;
-  margin: 0 auto;
-  height: 100vh;
-  justify-content: space-between;
 }
-
 .form-block {
   display: flex;
   flex-direction: column;
@@ -56,7 +81,6 @@ body, html {
   border: 1px solid #ccc;
   background: #fff;
   border-radius: 8px;
-  font-family: 'Work Sans', sans-serif;
 }
 .form-block input:focus {
   border-color: #d4bfa5;
@@ -71,35 +95,15 @@ body, html {
   color: #1a1a1a;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
 }
 .form-block button:hover {
   background: #c4ae93;
 }
 
-.hero-sneaker {
-  width: 100%;
-  text-align: center;
-  margin-top: 30px;
-}
-.hero-sneaker img {
-  max-width: 100%;
-  width: 360px;
-  height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
-}
-
-/* Game UI */
 #game {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
   background: url('https://i.postimg.cc/xjPfkhMT/Screenshot-2025-03-27-at-12-26-18-PM.png') no-repeat center center;
   background-size: cover;
 }
-
 .overlay {
   position: absolute;
   width: 100%;
@@ -107,86 +111,39 @@ body, html {
   background-color: rgba(0, 0, 0, 0.25);
   z-index: 1;
 }
-
 #catcher {
   width: 120px;
   height: 30px;
   background-color: #0077ff;
   position: absolute;
-  bottom: 200px;
+  bottom: 180px;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 15px;
   z-index: 2;
 }
-
 .item {
   position: absolute;
   top: 0;
   z-index: 2;
 }
 .good {
-  width: 100px;
-  height: 100px;
+  width: 200px;
+  height: 200px;
   background: url('https://i.postimg.cc/MT95hskb/Forest-Green.png') no-repeat center center / contain;
 }
-.bad {
+.bad, .deadly {
   width: 30px;
   height: 30px;
-  background-color: red;
   border-radius: 50%;
 }
-.deadly {
-  width: 30px;
-  height: 30px;
-  background-color: black;
-  border-radius: 50%;
-}
+.bad { background-color: red; }
+.deadly { background-color: black; }
 
-#score, #timer {
-  position: absolute;
-  top: 10px;
-  font-size: 18px;
-  color: #fff;
-  z-index: 2;
-}
-#score {
-  left: 10px;
-}
-#timer {
-  left: 120px;
-}
-#leaderboard {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 16px;
-  color: #fff;
-  background: rgba(0,0,0,0.6);
-  padding: 10px;
-  border-radius: 8px;
-  z-index: 2;
-}
-
-#popup {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  border: 2px solid #0077ff;
-  border-radius: 10px;
-  text-align: center;
-  z-index: 3;
-}
-
-/* Floating Start Instruction */
 #startInstructions {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 100px;
+  left: 10px;
   background: rgba(0, 0, 0, 0.75);
   color: white;
   font-size: 14px;
@@ -197,7 +154,6 @@ body, html {
   animation: bounceFade 7s ease-in-out forwards;
   pointer-events: none;
 }
-
 @keyframes bounceFade {
   0% { opacity: 0; transform: translateY(-10px); }
   10% { opacity: 1; transform: translateY(0); }
@@ -206,4 +162,37 @@ body, html {
   40% { transform: translateY(0); }
   90% { opacity: 1; }
   100% { opacity: 0; transform: translateY(0); }
+}
+#popup {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fffaf4;
+  padding: 30px;
+  border: 1px solid #d4bfa5;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 3;
+}
+#popup p {
+  font-size: 20px;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 20px;
+}
+#popup button {
+  padding: 12px 20px;
+  font-size: 16px;
+  margin: 6px;
+  border: none;
+  border-radius: 6px;
+  background-color: #d4bfa5;
+  color: #1a1a1a;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Work Sans', sans-serif;
+}
+#popup button:hover {
+  background-color: #c0ac93;
 }
