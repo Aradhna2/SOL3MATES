@@ -1,32 +1,45 @@
+
+// Firebase SDK (Module Import)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+import {
+  getDatabase, ref, push, onValue,
+  query, orderByChild, limitToLast
+} from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyD1my79wPEDlsfsgg2oW6lCv-PI1_XqLZs",
+  authDomain: "sol3mates.firebaseapp.com",
+  databaseURL: "https://sol3mates-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sol3mates",
+  storageBucket: "sol3mates.firebasestorage.app",
+  messagingSenderId: "412759700453",
+  appId: "1:412759700453:web:fc9269184892d60176350c"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// DOM elements
 const catcher = document.getElementById("catcher");
 const scoreDisplay = document.getElementById("score");
 const popup = document.getElementById("popup");
-const scoresList = document.getElementById("scores");
 const timerDisplay = document.getElementById("timer");
 const submitBtn = document.getElementById("submitScoreBtn");
 const retryBtn = document.getElementById("retryBtn");
 const game = document.getElementById("game");
 const form = document.getElementById("playerForm");
 const formContainer = document.getElementById("formContainer");
+const finalScoreText = document.getElementById("finalScore");
+const scoresList = document.getElementById("scores");
+const startInstructions = document.getElementById("startInstructions");
 
 let playerName = "", playerEmail = "", playerShoeSize = "";
 let score = 0, gameRunning = false;
 let itemFallSpeed = 5, spawnRate = 700;
 let countdownInterval, timeLeft = 30, moreHazards = false;
 
-// ✅ Show "Catch as many 320s..." on start
-function showStartInstructions() {
-  const msg = document.createElement("div");
-  msg.id = "startInstructions";
-  msg.innerText = "Catch as many 320s as you can";
-  game.appendChild(msg);
-
-  setTimeout(() => {
-    msg.remove();
-  }, 7000);
-}
-
-// ✅ Handle form submission and start game
+// Form submission
 form.addEventListener("submit", function (e) {
   e.preventDefault();
   playerName = document.getElementById("formName").value.trim();
@@ -36,18 +49,9 @@ form.addEventListener("submit", function (e) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const shoeRegex = /^(EU|UK|US)\s?(?:[1-9]|[1-3][0-9]|4[0-7])(\.5)?$/i;
 
-  if (!playerName || playerName.length < 2) {
-    alert("Please enter a valid name.");
-    return;
-  }
-  if (!emailRegex.test(playerEmail)) {
-    alert("Please enter a valid email.");
-    return;
-  }
-  if (!shoeRegex.test(playerShoeSize)) {
-    alert("Please enter a valid shoe size (e.g., EU 42.5).");
-    return;
-  }
+  if (!playerName || playerName.length < 2) return alert("Invalid name.");
+  if (!emailRegex.test(playerEmail)) return alert("Invalid email.");
+  if (!shoeRegex.test(playerShoeSize)) return alert("Invalid shoe size.");
 
   formContainer.style.display = "none";
   game.style.display = "block";
@@ -55,7 +59,14 @@ form.addEventListener("submit", function (e) {
 });
 
 submitBtn.onclick = function () {
-  alert(`Score submitted: ${score}`);
+  if (!playerName) return;
+  push(ref(db, "scores"), {
+    name: playerName,
+    score: score,
+    email: playerEmail,
+    shoeSize: playerShoeSize,
+    timestamp: Date.now()
+  });
   submitBtn.style.display = "none";
 };
 
@@ -76,11 +87,16 @@ function startGame() {
   gameRunning = true;
   showStartInstructions();
   startCountdown();
+  updateLeaderboard();
   spawnItem();
 }
 
-function clearGame() {
-  document.querySelectorAll(".item").forEach(item => item.remove());
+function showStartInstructions() {
+  startInstructions.style.display = "block";
+  startInstructions.style.animation = "bounceFade 7s ease-in-out forwards";
+  setTimeout(() => {
+    startInstructions.style.display = "none";
+  }, 7000);
 }
 
 function spawnItem() {
@@ -100,14 +116,18 @@ function spawnItem() {
     if (!gameRunning) return item.remove();
     let top = parseFloat(item.style.top || 0);
     item.style.top = `${top + itemFallSpeed}px`;
+
     const itemRect = item.getBoundingClientRect();
     const catcherRect = catcher.getBoundingClientRect();
-    if (
+
+    const isTouching = (
       itemRect.bottom >= catcherRect.top &&
-      itemRect.left < catcherRect.right &&
-      itemRect.right > catcherRect.left &&
-      itemRect.top < catcherRect.bottom
-    ) {
+      itemRect.top <= catcherRect.bottom &&
+      itemRect.right >= catcherRect.left &&
+      itemRect.left <= catcherRect.right
+    );
+
+    if (isTouching) {
       handleItemCatch(type);
       item.remove();
     } else if (top > window.innerHeight) {
@@ -116,6 +136,7 @@ function spawnItem() {
       requestAnimationFrame(fall);
     }
   }
+
   fall();
   setTimeout(spawnItem, spawnRate);
 }
@@ -161,29 +182,46 @@ function updateTimerDisplay() {
 
 function endGame() {
   popup.style.display = "block";
+  finalScoreText.textContent = `Your score: ${score}`;
   submitBtn.style.display = "inline-block";
 }
 
-// Touch + mouse control
+function clearGame() {
+  document.querySelectorAll(".item").forEach(i => i.remove());
+}
+
+function updateLeaderboard() {
+  const leaderboardRef = query(ref(db, "scores"), orderByChild("score"), limitToLast(3));
+  onValue(leaderboardRef, (snapshot) => {
+    const scores = [];
+    snapshot.forEach((child) => {
+      scores.push(child.val());
+    });
+    scores.reverse();
+    scoresList.innerHTML = "";
+    scores.forEach(entry => {
+      const li = document.createElement("li");
+      li.textContent = `${entry.name}: ${entry.score}`;
+      scoresList.appendChild(li);
+    });
+  });
+}
+
 document.addEventListener("touchmove", (e) => {
   if (!gameRunning) return;
-  const touchX = e.touches[0].clientX;
-  const newLeft = touchX - catcher.offsetWidth / 2;
-  catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, newLeft))}px`;
+  const x = e.touches[0].clientX - catcher.offsetWidth / 2;
+  catcher.style.left = `${Math.max(0, Math.min(x, game.offsetWidth - catcher.offsetWidth))}px`;
 });
-
 document.addEventListener("mousemove", (e) => {
   if (!gameRunning) return;
-  const mouseX = e.clientX;
-  const newLeft = mouseX - catcher.offsetWidth / 2;
-  catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, newLeft))}px`;
+  const x = e.clientX - catcher.offsetWidth / 2;
+  catcher.style.left = `${Math.max(0, Math.min(x, game.offsetWidth - catcher.offsetWidth))}px`;
 });
-
 document.addEventListener("keydown", (e) => {
   if (!gameRunning) return;
+  let x = catcher.offsetLeft;
   const step = 30;
-  let catcherLeft = catcher.offsetLeft;
-  if (e.key === "ArrowLeft") catcherLeft -= step;
-  if (e.key === "ArrowRight") catcherLeft += step;
-  catcher.style.left = `${Math.min(game.offsetWidth - catcher.offsetWidth, Math.max(0, catcherLeft))}px`;
+  if (e.key === "ArrowLeft") x -= step;
+  if (e.key === "ArrowRight") x += step;
+  catcher.style.left = `${Math.max(0, Math.min(x, game.offsetWidth - catcher.offsetWidth))}px`;
 });
