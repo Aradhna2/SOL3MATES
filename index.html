@@ -8,55 +8,43 @@
 </head>
 <body>
 <!-- partial:index.partial.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>sol3mates-320s</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <!-- Pre-Game Form -->
-  <div id="formContainer">
-    <h2>Before You Play</h2>
-    <form id="playerForm">
-      <label for="formName">Name:</label>
-      <input type="text" id="formName" required />
+<!-- Sol3mates Logo (Visible on both form + game) -->
+<a href="https://www.sol3mates.xyz" class="logo-link" target="_blank" rel="noopener">
+  <img src="https://i.postimg.cc/T11w8b5h/white-320s.png" alt="Sol3mates Logo" class="logo" />
+</a>
 
-      <label for="formEmail">Email Address:</label>
-      <input type="email" id="formEmail" required />
-
-      <label for="formShoe">Shoe Size (e.g., EU 42, UK 9.5):</label>
-      <input type="text" id="formShoe" required />
-
-      <button type="submit">Start Game</button>
-    </form>
+<!-- Landing Form -->
+<div id="formContainer">
+  <form id="playerForm" class="form-block">
+    <input type="text" id="formName" placeholder="Name" required />
+    <input type="email" id="formEmail" placeholder="Email Address" required />
+    <input type="text" id="formShoe" placeholder="Shoe Size (e.g., EU 42, UK 9.5)" required />
+    <button type="submit">Play Now</button>
+  </form>
+  <div class="hero-sneaker">
+    <img src="https://i.postimg.cc/xjPfkhMT/Screenshot-2025-03-27-at-12-26-18-PM.png" alt="320s Sneaker" />
   </div>
+</div>
 
-  <!-- Game UI -->
-  <div id="game" style="display: none;">
-    <div class="overlay"></div>
-    <div id="catcher"></div>
-    <div id="score">Score: 0</div>
-    <div id="timer">Time: 30</div>
-    <div id="leaderboard">
-      <strong>Top Scores:</strong>
-      <ol id="scores"></ol>
-    </div>
-    <div id="popup">
-      <p>Game Over!</p>
-      <button id="submitScoreBtn">Submit your score</button>
-      <br><br>
-      <button id="retryBtn">Retry</button>
-    </div>
+<!-- Game UI -->
+<main id="game" style="display: none;">
+  <div class="overlay"></div>
+  <div id="catcher"></div>
+  <div id="score">Score: 0</div>
+  <div id="timer">Time: 30</div>
+  <div id="leaderboard">
+    <strong>Top Scores:</strong>
+    <ol id="scores"></ol>
   </div>
-
-  <script type="module" src="script.js"></script>
-</body>
-</html>
+  <div id="popup">
+    <p>Game Over!</p>
+    <button id="submitScoreBtn">Submit your score</button>
+    <br><br>
+    <button id="retryBtn">Retry</button>
+  </div>
+</main>
 <!-- partial -->
-  <script type="module" src="./script.js"></script>
+  <script  src="./script.js"></script>
 
 </body>
 </html>

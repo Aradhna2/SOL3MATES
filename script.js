@@ -1,22 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-import {
-  getDatabase, ref, push, onValue,
-  query, orderByChild, limitToLast
-} from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD1my79wPEDlsfsgg2oW6lCv-PI1_XqLZs",
-  authDomain: "sol3mates.firebaseapp.com",
-  databaseURL: "https://sol3mates-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "sol3mates",
-  storageBucket: "sol3mates.firebasestorage.app",
-  messagingSenderId: "412759700453",
-  appId: "1:412759700453:web:fc9269184892d60176350c"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
 const catcher = document.getElementById("catcher");
 const scoreDisplay = document.getElementById("score");
 const popup = document.getElementById("popup");
@@ -33,6 +14,19 @@ let score = 0, gameRunning = false;
 let itemFallSpeed = 5, spawnRate = 700;
 let countdownInterval, timeLeft = 30, moreHazards = false;
 
+// ✅ Show "Catch as many 320s..." on start
+function showStartInstructions() {
+  const msg = document.createElement("div");
+  msg.id = "startInstructions";
+  msg.innerText = "Catch as many 320s as you can";
+  game.appendChild(msg);
+
+  setTimeout(() => {
+    msg.remove();
+  }, 7000);
+}
+
+// ✅ Handle form submission and start game
 form.addEventListener("submit", function (e) {
   e.preventDefault();
   playerName = document.getElementById("formName").value.trim();
@@ -43,15 +37,15 @@ form.addEventListener("submit", function (e) {
   const shoeRegex = /^(EU|UK|US)\s?(?:[1-9]|[1-3][0-9]|4[0-7])(\.5)?$/i;
 
   if (!playerName || playerName.length < 2) {
-    alert("Please enter a valid name (min 2 characters).");
+    alert("Please enter a valid name.");
     return;
   }
   if (!emailRegex.test(playerEmail)) {
-    alert("Please enter a valid email address.");
+    alert("Please enter a valid email.");
     return;
   }
   if (!shoeRegex.test(playerShoeSize)) {
-    alert("Shoe size must include UK, US, or EU followed by a size up to 47 (e.g., EU 42.5).");
+    alert("Please enter a valid shoe size (e.g., EU 42.5).");
     return;
   }
 
@@ -61,14 +55,7 @@ form.addEventListener("submit", function (e) {
 });
 
 submitBtn.onclick = function () {
-  if (!playerName) return;
-  push(ref(db, "scores"), {
-    name: playerName,
-    score: score,
-    email: playerEmail,
-    shoeSize: playerShoeSize,
-    timestamp: Date.now()
-  });
+  alert(`Score submitted: ${score}`);
   submitBtn.style.display = "none";
 };
 
@@ -78,40 +65,22 @@ retryBtn.onclick = function () {
   startGame();
 };
 
-function updateLeaderboard() {
-  const leaderboardRef = query(ref(db, "scores"), orderByChild("score"), limitToLast(3));
-  onValue(leaderboardRef, (snapshot) => {
-    const scores = [];
-    snapshot.forEach((child) => {
-      scores.push(child.val());
-    });
-    scores.reverse();
-    scoresList.innerHTML = "";
-    scores.forEach(entry => {
-      const li = document.createElement("li");
-      li.textContent = `${entry.name}: ${entry.score}`;
-      scoresList.appendChild(li);
-    });
-  });
-}
-
 function startGame() {
+  score = 0;
+  timeLeft = 30;
+  moreHazards = false;
+  itemFallSpeed = 5;
+  spawnRate = 700;
+  scoreDisplay.textContent = "Score: 0";
+  updateTimerDisplay();
   gameRunning = true;
-  updateLeaderboard();
-  countdownInterval = setInterval(updateCountdown, 1000);
+  showStartInstructions();
+  startCountdown();
   spawnItem();
 }
 
 function clearGame() {
-  score = 0;
-  timeLeft = 30;
-  itemFallSpeed = 5;
-  spawnRate = 700;
-  moreHazards = false;
-  gameRunning = false;
-  scoreDisplay.textContent = "Score: 0";
-  updateTimerDisplay();
-  document.querySelectorAll(".item").forEach(el => el.remove());
+  document.querySelectorAll(".item").forEach(item => item.remove());
 }
 
 function spawnItem() {
@@ -136,7 +105,8 @@ function spawnItem() {
     if (
       itemRect.bottom >= catcherRect.top &&
       itemRect.left < catcherRect.right &&
-      itemRect.right > catcherRect.left
+      itemRect.right > catcherRect.left &&
+      itemRect.top < catcherRect.bottom
     ) {
       handleItemCatch(type);
       item.remove();
@@ -168,19 +138,21 @@ function handleItemCatch(type) {
   scoreDisplay.textContent = `Score: ${score}`;
 }
 
-function updateCountdown() {
-  if (!gameRunning) return;
-  timeLeft--;
-  updateTimerDisplay();
-  if (timeLeft <= 23 && !moreHazards) {
-    moreHazards = true;
-    itemFallSpeed += 1.5;
-  }
-  if (timeLeft <= 0) {
-    clearInterval(countdownInterval);
-    gameRunning = false;
-    endGame();
-  }
+function startCountdown() {
+  countdownInterval = setInterval(() => {
+    if (!gameRunning) return clearInterval(countdownInterval);
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 23 && !moreHazards) {
+      moreHazards = true;
+      itemFallSpeed += 1.5;
+    }
+    if (timeLeft <= 0) {
+      clearInterval(countdownInterval);
+      gameRunning = false;
+      endGame();
+    }
+  }, 1000);
 }
 
 function updateTimerDisplay() {
@@ -192,6 +164,7 @@ function endGame() {
   submitBtn.style.display = "inline-block";
 }
 
+// Touch + mouse control
 document.addEventListener("touchmove", (e) => {
   if (!gameRunning) return;
   const touchX = e.touches[0].clientX;
