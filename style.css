@@ -197,7 +197,7 @@ body {
 /* Leaderboard */
 #leaderboard {
   position: absolute;
-  top: 90px; /* moved down by 20px */
+  top: 110px; /* 70px + 40px */
   right: 10px;
   font-size: 16px;
   color: #fff;
