@@ -197,7 +197,7 @@ body {
 /* Leaderboard */
 #leaderboard {
   position: absolute;
-  top: 10px;
+  top: 90px; /* moved down by 20px */
   right: 10px;
   font-size: 16px;
   color: #fff;
@@ -210,7 +210,7 @@ body {
 /* Floating Instructions */
 #startInstructions {
   position: absolute;
-  top: 42px;
+  top: 50px; /* moved down by 8px */
   left: 10px;
   background: rgba(0, 0, 0, 0.75);
   color: white;
