@@ -156,3 +156,8 @@ html, body {
   border-radius: 50%;
   position: absolute;
 }
+.item {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+}
