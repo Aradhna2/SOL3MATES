@@ -133,3 +133,26 @@ html, body {
   cursor: pointer;
   font-family: 'Work Sans', sans-serif;
 }
+
+.good {
+  width: 150px;
+  height: 150px;
+  background: url('https://i.postimg.cc/MT95hskb/Forest-Green.png') no-repeat center center / contain;
+  position: absolute;
+}
+
+.bad {
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.deadly {
+  width: 30px;
+  height: 30px;
+  background-color: black;
+  border-radius: 50%;
+  position: absolute;
+}
