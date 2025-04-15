@@ -77,6 +77,7 @@ function startCountdown() {
   }, 1000);
 }
 
+console.log("Starting game — spawning items");
 function spawnItem() {
   if (!gameRunning) return;
 
