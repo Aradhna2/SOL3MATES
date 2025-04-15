@@ -1,4 +1,16 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+import {
+  getDatabase, ref, push, onValue,
+  query, orderByChild, limitToLast
+} from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
+// ✅ DEBUG CHECK
+console.log("JS Loaded ✅");
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD1my79wPEDlsfsgg2oW6lCv-PI1_XqLZs",
+  ...
+};
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
 import {
   getDatabase, ref, push, onValue,
