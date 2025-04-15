@@ -118,6 +118,33 @@ function spawnItem() {
   setTimeout(spawnItem, spawnRate);
 }
 
+  function fall() {
+    if (!gameRunning) return item.remove();
+    let top = parseFloat(item.style.top || 0);
+    item.style.top = `${top + fallSpeed}px`;
+
+    const itemRect = item.getBoundingClientRect();
+    const catcherRect = catcher.getBoundingClientRect();
+    const isTouching =
+      itemRect.bottom >= catcherRect.top &&
+      itemRect.top <= catcherRect.bottom &&
+      itemRect.right >= catcherRect.left &&
+      itemRect.left <= catcherRect.right;
+
+    if (isTouching) {
+      handleItem(type);
+      item.remove();
+    } else if (top > window.innerHeight) {
+      item.remove();
+    } else {
+      requestAnimationFrame(fall);
+    }
+  }
+
+  fall();
+  setTimeout(spawnItem, spawnRate);
+}
+
 function handleItem(type) {
   if (type === "good") {
     score++;
