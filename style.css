@@ -197,7 +197,7 @@ body {
 /* Leaderboard */
 #leaderboard {
   position: fixed;
-  top: 30px;           /* Aligns with score & timer */
+  top: 20px;           /* Aligns with score & timer */
   right: 10px;
   font-size: 14px;
   color: #fff;
@@ -205,7 +205,7 @@ body {
   padding: 10px 12px;
   border-radius: 8px;
   z-index: 1000;
-  max-width: 150px;
+  max-width: 160px;
 }
 
 /* Floating Instructions */
