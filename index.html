@@ -16,26 +16,25 @@
       <input type="text" id="formShoe" placeholder="Shoe Size (e.g., EU 42, UK 9.5)" required />
       <button type="submit">Play Now</button>
     </form>
+    <div id="betaTag">BETA 0.0.3</div>
   </div>
 
   <main id="game" style="display: none;">
-    <a href="https://www.sol3mates.xyz" class="logo-link in-game" target="_blank" rel="noopener">
-      <img src="https://i.postimg.cc/T11w8b5h/white-320s.png" alt="Sol3mates Logo" class="logo" />
-    </a>
     <div class="overlay"></div>
     <div id="catcher"></div>
     <div id="score">Score: 0</div>
     <div id="timer">Time: 30</div>
     <div id="startInstructions">Catch as many 320s as you can</div>
     <div id="leaderboard">
-      <strong>Top Scores:</strong>
+      <h4>Top Scores:</h4>
       <ol id="scores"></ol>
     </div>
     <div id="popup">
-      <p id="finalScore"></p>
-      <button id="submitScoreBtn">Submit your score</button>
-      <br><br>
-      <button id="retryBtn">Retry</button>
+      <p id="popupMessage"></p>
+      <div class="popup-buttons">
+        <button id="submitScoreBtn">Submit your score</button>
+        <button id="retryBtn">Retry</button>
+      </div>
     </div>
   </main>
 </body>
