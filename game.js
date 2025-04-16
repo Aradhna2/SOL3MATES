@@ -69,7 +69,7 @@ function setupGame() {
     if (!shoeRegex.test(playerShoeSize)) return alert("Invalid shoe size. Format examples: EU 42, UK 9.5, US 10");
 
     formContainer.style.display = "none";
-    game.style.display = "block";
+    game.style.display = "none";
     startGame();
   });
 
