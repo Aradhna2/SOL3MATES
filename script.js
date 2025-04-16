@@ -53,8 +53,9 @@ form.addEventListener("submit", function (e) {
   if (!emailRegex.test(playerEmail)) return alert("Invalid email.");
   if (!shoeRegex.test(playerShoeSize)) return alert("Invalid shoe size.");
 
-  formContainer.style.display = "none";
-  game.style.display = "block";
+ formContainer.style.display = "none";
+game.style.display = "block";
+game.style.visibility = "visible";
   startGame();
 });
 
