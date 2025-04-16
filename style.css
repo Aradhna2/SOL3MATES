@@ -33,15 +33,17 @@ body {
 }
 
 #game {
-  display: none; /* hidden until form is submitted */
-  position: fixed;
+  display: none;               /* Hidden on landing page */
+  visibility: hidden;          /* Extra layer of hiding */
+  position: fixed;             /* Take it out of layout flow */
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  z-index: 0;
+  z-index: -1;                 /* Behind everything */
 }
+
 /* Logo only visible during gameplay */
 .logo-link {
   display: none;
