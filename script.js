@@ -1,11 +1,4 @@
-// Firebase SDK (Module Import)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-import {
-  getDatabase, ref, push, onValue,
-  query, orderByChild, limitToLast
-} from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
-
-// Firebase Config
+// ✅ Firebase Config (already loaded via script tag in HTML)
 const firebaseConfig = {
   apiKey: "AIzaSyD1my79wPEDlsfsgg2oW6lCv-PI1_XqLZs",
   authDomain: "sol3mates.firebaseapp.com",
@@ -16,12 +9,10 @@ const firebaseConfig = {
   appId: "1:412759700453:web:fc9269184892d60176350c"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-console.log("✅ Firebase + script.js loaded");
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-// DOM elements
+// ✅ DOM references
 const catcher = document.getElementById("catcher");
 const scoreDisplay = document.getElementById("score");
 const popup = document.getElementById("popup");
@@ -40,48 +31,27 @@ let score = 0, gameRunning = false;
 let itemFallSpeed = 5, spawnRate = 700;
 let countdownInterval, timeLeft = 30, moreHazards = false;
 
-// Form submission
+// ✅ Form submit
 form.addEventListener("submit", function (e) {
   e.preventDefault();
-    console.log("✅ Form submitted!");
   playerName = document.getElementById("formName").value.trim();
   playerEmail = document.getElementById("formEmail").value.trim();
   playerShoeSize = document.getElementById("formShoe").value.trim();
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const shoeRegex = /^(EU|UK|US)\s?(?:[1-9]|[1-3][0-9]|4[0-7])(\.5)?$/i;
+  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+  const shoeRegex = /^(EU|UK|US)\\s?(?:[1-9]|[1-3][0-9]|4[0-7])(\\.5)?$/i;
 
   if (!playerName || playerName.length < 2) return alert("Invalid name.");
   if (!emailRegex.test(playerEmail)) return alert("Invalid email.");
   if (!shoeRegex.test(playerShoeSize)) return alert("Invalid shoe size.");
 
- formContainer.style.display = "none";
-game.style.display = "block";
-game.style.visibility = "visible";
+  formContainer.style.display = "none";
+  game.style.display = "block";
+  game.style.visibility = "visible";
   startGame();
 });
 
-// Submit score to Firebase
-submitBtn.onclick = function () {
-  if (!playerName) return;
-  push(ref(db, "scores"), {
-    name: playerName,
-    score: score,
-    email: playerEmail,
-    shoeSize: playerShoeSize,
-    timestamp: Date.now()
-  });
-  submitBtn.style.display = "none";
-};
-
-// Retry game without form
-retryBtn.onclick = function () {
-  popup.style.display = "none";
-  clearGame();
-  startGame();
-};
-
-// Start game
+// ✅ Start game logic
 function startGame() {
   score = 0;
   timeLeft = 30;
@@ -97,7 +67,7 @@ function startGame() {
   spawnItem();
 }
 
-// Show intro popup
+// ✅ Intro instructions
 function showStartInstructions() {
   startInstructions.style.display = "block";
   startInstructions.style.animation = "bounceFade 7s ease-in-out forwards";
@@ -106,7 +76,7 @@ function showStartInstructions() {
   }, 7000);
 }
 
-// Spawn falling items
+// ✅ Spawn items
 function spawnItem() {
   if (!gameRunning) return;
   const item = document.createElement("div");
@@ -127,7 +97,6 @@ function spawnItem() {
 
     const itemRect = item.getBoundingClientRect();
     const catcherRect = catcher.getBoundingClientRect();
-
     const isTouching = (
       itemRect.bottom >= catcherRect.top &&
       itemRect.top <= catcherRect.bottom &&
@@ -149,7 +118,7 @@ function spawnItem() {
   setTimeout(spawnItem, spawnRate);
 }
 
-// Catch item logic
+// ✅ Catch logic
 function handleItemCatch(type) {
   if (type === "good") {
     score++;
@@ -168,7 +137,7 @@ function handleItemCatch(type) {
   scoreDisplay.textContent = `Score: ${score}`;
 }
 
-// Countdown timer
+// ✅ Countdown
 function startCountdown() {
   countdownInterval = setInterval(() => {
     if (!gameRunning) return clearInterval(countdownInterval);
@@ -190,22 +159,41 @@ function updateTimerDisplay() {
   timerDisplay.textContent = `Time: ${timeLeft}`;
 }
 
-// End screen
+// ✅ End screen
 function endGame() {
   popup.style.display = "block";
   finalScoreText.textContent = `Your score: ${score}`;
   submitBtn.style.display = "inline-block";
 }
 
-// Remove items
+// ✅ Retry button
+retryBtn.onclick = function () {
+  popup.style.display = "none";
+  clearGame();
+  startGame();
+};
+
+// ✅ Submit score
+submitBtn.onclick = function () {
+  if (!playerName) return;
+  firebase.database().ref("scores").push({
+    name: playerName,
+    score: score,
+    email: playerEmail,
+    shoeSize: playerShoeSize,
+    timestamp: Date.now()
+  });
+  submitBtn.style.display = "none";
+};
+
+// ✅ Clear items
 function clearGame() {
   document.querySelectorAll(".item").forEach(i => i.remove());
 }
 
-// Leaderboard
+// ✅ Leaderboard
 function updateLeaderboard() {
-  const leaderboardRef = query(ref(db, "scores"), orderByChild("score"), limitToLast(3));
-  onValue(leaderboardRef, (snapshot) => {
+  firebase.database().ref("scores").orderByChild("score").limitToLast(3).on("value", (snapshot) => {
     const scores = [];
     snapshot.forEach((child) => {
       scores.push(child.val());
@@ -220,7 +208,7 @@ function updateLeaderboard() {
   });
 }
 
-// Controls
+// ✅ Controls
 document.addEventListener("touchmove", (e) => {
   if (!gameRunning) return;
   const x = e.touches[0].clientX - catcher.offsetWidth / 2;
