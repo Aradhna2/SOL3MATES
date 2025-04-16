@@ -25,7 +25,6 @@ body {
   justify-content: center;
   align-items: center;
 }
-#game,
 #formContainer {
   width: 100vw;
   height: 100vh;
@@ -33,6 +32,16 @@ body {
   position: relative;
 }
 
+#game {
+  display: none; /* hidden until form is submitted */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0;
+}
 /* Logo only visible during gameplay */
 .logo-link {
   display: none;
