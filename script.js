@@ -19,6 +19,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+console.log("✅ Firebase + script.js loaded");
 
 // DOM elements
 const catcher = document.getElementById("catcher");
@@ -42,6 +43,7 @@ let countdownInterval, timeLeft = 30, moreHazards = false;
 // Form submission
 form.addEventListener("submit", function (e) {
   e.preventDefault();
+    console.log("✅ Form submitted!");
   playerName = document.getElementById("formName").value.trim();
   playerEmail = document.getElementById("formEmail").value.trim();
   playerShoeSize = document.getElementById("formShoe").value.trim();
