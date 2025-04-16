@@ -54,7 +54,7 @@ form.addEventListener("submit", function (e) {
   if (!shoeRegex.test(playerShoeSize)) return alert("Invalid shoe size.");
 
   formContainer.style.display = "none";
-  game.style.display = "block";
+  game.style.display = "none";
   startGame();
 });
 
